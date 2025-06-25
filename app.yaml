@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-app
+  template:
+    metadata:
+      labels:
+        app: demo-app
+    spec:
+      containers:
+        - name: demo-app
+          image: busybox
+          command: ["sh", "-c", "echo hey there && sleep 3600"]
+          volumeMounts:
+            - mountPath: "/data"
+              name: demo-vol
+      volumes:
+        - name: demo-vol
+          persistentVolumeClaim:
+            claimName: pvc-demo
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-demo
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 1Gi
+  volumeName: meri-pv
+  storageClassName: local-storage  
